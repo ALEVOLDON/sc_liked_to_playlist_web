@@ -1,0 +1,38 @@
+sc_liked_to_playlist_web/
+│
+├── src/                      # Папка для основного Python кода (логика)
+│   ├── __init__.py           # Обязательный файл, делает 'src' Python пакетом
+│   ├── config.py             # Файл для настроек (пути, параметры API и т.д.)
+│   ├── downloader.py         # Модуль с логикой скачивания (используя yt-dlp)
+│   ├── metadata.py           # Модуль для работы с метаданными MP3 (mutagen)
+│   ├── playlist.py           # Модуль для генерации плейлистов (JSON, M3U)
+│   ├── scraper.py            # Модуль с основной логикой скрапинга (Selenium)
+│   └── utils.py              # Вспомогательные функции (очистка имен, фильтры и т.д.)
+│
+├── app/                      # Папка для пользовательских интерфейсов
+│   └── liker_app.py          # Streamlit приложение (импортирует функции из src/)
+│
+├── web_player/               # Статические файлы веб-плеера
+│   ├── index.html            # HTML плеера
+│   ├── style.css             # CSS стили (вынесены из HTML)
+│   ├── script.js             # JavaScript плеера (вынесен из HTML)
+│   └── assets/               # (Опционально) для иконок, шрифтов и т.д.
+│       └── ...
+│
+├── data/                     # Папка для данных и логов
+│   ├── liked_tracks.csv      # CSV файл с лайками
+│   ├── downloaded.txt        # Архив скачанных yt-dlp
+│   ├── download_log.txt      # Лог скачивания
+│   ├── cleanup_log.txt       # Лог очистки
+│   └── playlist.json         # Генерируемый JSON для веб-плеера
+│
+├── downloads/                # Скачанные MP3 и обложки
+│   └── ...
+│
+├── downloads_backup/         # Бэкапы папки downloads
+│   └── ...
+│
+├── run_downloader.py         # Главный скрипт для запуска процесса скачивания
+├── run_cleanup.py            # Скрипт для запуска очистки
+├── requirements.txt          # Зависимости Python
+└── README.md                 # Описание проекта

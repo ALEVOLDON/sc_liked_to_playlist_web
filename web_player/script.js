@@ -1,32 +1,3 @@
-// Копируем весь JavaScript код из блока <script>...</script> файла index.html
-// из предыдущего ответа (где был улучшенный дизайн плеера) сюда.
-// Пример начала файла:
-class MusicPlayer {
-    constructor() {
-        this.audio = new Audio();
-        this.playlist = [];
-        this.currentTrackIndex = -1;
-        this.isPlaying = false;
-        this.isShuffled = false;
-        this.repeatMode = 'off'; // 'off', 'all', 'one'
-        this.originalPlaylist = [];
-
-        // Иконки Play/Pause (Material Symbols names)
-        this.playIconName = 'play_arrow';
-        this.pauseIconName = 'pause';
-        // ... и так далее, весь JS код ...
-    }
-
-    // ... все методы класса MusicPlayer ...
-
-}
-
-// Инициализация плеера
-document.addEventListener('DOMContentLoaded', () => {
-    const player = new MusicPlayer();
-    window.musicPlayer = player; // Опционально: сделать доступным глобально для отладки
-});
-
 class MusicPlayer {
     constructor() {
         this.audio = new Audio();
@@ -113,25 +84,25 @@ class MusicPlayer {
          document.body.classList.toggle('dark-theme', savedTheme === 'dark');
          this.updateThemeIcon(savedTheme);
      }
-     toggleTheme() { /* ... (как в пред. ответе) ... */
+     toggleTheme() {
          const isDark = document.body.classList.toggle('dark-theme');
          const newTheme = isDark ? 'dark' : 'light';
          localStorage.setItem('playerTheme', newTheme);
          this.updateThemeIcon(newTheme);
      }
-     updateThemeIcon(theme) { /* ... (как в пред. ответе) ... */
+     updateThemeIcon(theme) {
          this.dom.themeIcon.textContent = theme === 'dark' ? this.lightIconName : this.darkIconName;
      }
      // --- End Theme Handling ---
 
 
-    displayPlaylistError(message) { /* ... (как в пред. ответе) ... */
+    displayPlaylistError(message) {
          this.dom.playlistContainer.innerHTML = '';
          this.dom.playlistErrorEl.textContent = message;
          this.dom.playlistErrorEl.style.display = 'block';
     }
 
-    loadPlaylist() { /* ... (как в пред. ответе, но вызывает updateTrackInfo для сохраненного индекса) ... */
+    loadPlaylist() {
          this.dom.playlistContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">Загрузка плейлиста...</div>';
         fetch('playlist.json')
             .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); })
@@ -179,7 +150,7 @@ class MusicPlayer {
          this.dom.searchInput.addEventListener('input', (e) => this.filterPlaylist(e.target.value));
 
 
-        this.dom.progressContainer.addEventListener('click', (e) => { /* ... (как в пред. ответе) ... */
+        this.dom.progressContainer.addEventListener('click', (e) => {
             if (!this.audio.duration) return;
              const rect = this.dom.progressContainer.getBoundingClientRect();
              const offsetX = e.clientX - rect.left;
@@ -195,7 +166,7 @@ class MusicPlayer {
         this.audio.addEventListener('volumechange', () => { this.dom.volumeSlider.value = this.audio.volume; this.saveState(); }); // Сохраняем громкость
         this.audio.addEventListener('play', () => { this.isPlaying = true; this.updatePlayPauseIcon(); this.highlightCurrentTrack(); }); // Обновляем статус при старте
         this.audio.addEventListener('pause', () => { this.isPlaying = false; this.updatePlayPauseIcon(); this.saveState(); }); // Сохраняем при паузе (включая конец трека)
-        this.audio.addEventListener('error', (e) => { /* ... (как в пред. ответе) ... */
+        this.audio.addEventListener('error', (e) => {
               console.error("Ошибка аудио:", this.audio.error);
               const trackSrc = this.playlist[this.currentTrackIndex]?.src || "N/A";
               this.dom.trackTitle.textContent = "Ошибка загрузки";
@@ -205,7 +176,7 @@ class MusicPlayer {
 
 
         // Горячие клавиши
-        document.addEventListener('keydown', (e) => { /* ... (как в пред. ответе) ... */
+        document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (e.key === ' ') { e.preventDefault(); this.togglePlay(); }
             else if (e.key === 'ArrowLeft') { e.preventDefault(); this.playPrevious(); }
@@ -262,7 +233,7 @@ class MusicPlayer {
                  </div>
                  <div class="duration">${durationStr}</div>
             `;
-            item.addEventListener('click', () => { /* ... (как в пред. ответе) ... */
+            item.addEventListener('click', () => {
                  if (this.currentTrackIndex !== index) { this.currentTrackIndex = index; this.loadAndPlay(); }
                  else if (!this.isPlaying) { this.play(); }
                  else { this.pause(); }
@@ -273,7 +244,7 @@ class MusicPlayer {
          this.highlightCurrentTrack();
     }
 
-     highlightCurrentTrack() { /* ... (как в пред. ответе) ... */
+     highlightCurrentTrack() {
           this.dom.playlistContainer.querySelectorAll('.playlist-item.active').forEach(el => el.classList.remove('active'));
           if (this.currentTrackIndex >= 0 && this.currentTrackIndex < this.playlist.length) {
                const activeItem = this.dom.playlistContainer.querySelector(`.playlist-item[data-index="${this.currentTrackIndex}"]`);
@@ -288,7 +259,7 @@ class MusicPlayer {
           }
      }
 
-     updateTrackInfo(index) { /* ... (как в пред. ответе) ... */
+     updateTrackInfo(index) {
           if (index < 0 || index >= this.playlist.length) {
                this.dom.trackTitle.textContent = 'Выберите трек'; this.dom.trackArtist.textContent = '-';
                this.dom.coverImage.classList.add('hidden'); this.dom.coverImage.src = ''; return;
@@ -307,7 +278,7 @@ class MusicPlayer {
          else { this.dom.durationEl.textContent = '0:00'; } // Или если длительности нет в JSON
      }
 
-    loadAndPlay() { /* ... (как в пред. ответе, но сохраняет состояние) ... */
+    loadAndPlay() {
          if (this.currentTrackIndex < 0 || this.currentTrackIndex >= this.playlist.length) return;
         const track = this.playlist[this.currentTrackIndex];
          if (!track) return; // Доп. проверка
@@ -321,30 +292,30 @@ class MusicPlayer {
         } else { this.isPlaying = true; this.updatePlayPauseIcon(); this.saveState(); }
     }
 
-    togglePlay() { /* ... (как в пред. ответе) ... */
+    togglePlay() {
         if (this.playlist.length === 0) return;
         if (this.currentTrackIndex === -1) { this.currentTrackIndex = 0; this.loadAndPlay(); }
         else if (this.isPlaying) { this.pause(); } else { this.play(); }
     }
-    play() { /* ... (как в пред. ответе) ... */
+    play() {
         if (!this.audio.src && this.playlist.length > 0) { this.currentTrackIndex = Math.max(0, this.currentTrackIndex); this.loadAndPlay(); return; }
         if(this.audio.src) { this.audio.play().then(() => { this.isPlaying = true; this.updatePlayPauseIcon(); this.highlightCurrentTrack(); }).catch(e => console.error("Ошибка play():", e)); }
     }
-    pause() { /* ... (как в пред. ответе) ... */
+    pause() {
         this.audio.pause(); this.isPlaying = false; this.updatePlayPauseIcon();
         // Save state on pause too, because timeupdate might not fire exactly at the end
         this.saveState();
     }
 
-    updatePlayPauseIcon() { /* ... (как в пред. ответе) ... */
+    updatePlayPauseIcon() {
         this.dom.playPauseIcon.textContent = this.isPlaying ? this.pauseIconName : this.playIconName;
     }
-    playNext() { /* ... (как в пред. ответе) ... */
+    playNext() {
         if (this.playlist.length === 0) return;
         this.currentTrackIndex = (this.currentTrackIndex + 1) % this.playlist.length;
         this.loadAndPlay();
     }
-    playPrevious() { /* ... (как в пред. ответе) ... */
+    playPrevious() {
          if (this.playlist.length === 0) return; let newIndex;
          if (this.audio.currentTime < 3 && this.currentTrackIndex !== 0) { newIndex = this.currentTrackIndex - 1; }
          else if (this.audio.currentTime < 3 && this.currentTrackIndex === 0) { newIndex = this.playlist.length - 1; }
@@ -352,7 +323,7 @@ class MusicPlayer {
          this.currentTrackIndex = newIndex; this.loadAndPlay();
     }
 
-    updateProgress() { /* ... (как в пред. ответе) ... */
+    updateProgress() {
         if (this.audio.duration && isFinite(this.audio.duration)) {
             const progress = (this.audio.currentTime / this.audio.duration) * 100;
             this.dom.progressBar.style.width = `${progress}%`;
@@ -360,7 +331,7 @@ class MusicPlayer {
             if (this.dom.durationEl.textContent !== this.formatTime(this.audio.duration)) { this.dom.durationEl.textContent = this.formatTime(this.audio.duration); }
         } else { this.dom.progressBar.style.width = '0%'; this.dom.currentTimeEl.textContent = '0:00'; }
     }
-    formatTime(seconds) { /* ... (как в пред. ответе) ... */
+    formatTime(seconds) {
          if (isNaN(seconds) || !isFinite(seconds)) return "0:00";
         const minutes = Math.floor(seconds / 60); const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;

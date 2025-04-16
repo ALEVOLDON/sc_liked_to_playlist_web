@@ -3,30 +3,28 @@ import streamlit as st
 import pandas as pd
 import os
 import sys
-import logging
+import logging # Оставим импорт logging, т.к. он может понадобиться для логгирования в будущем
 
-# --- Добавляем путь к 'src' для импорта модулей ---
-# Это нужно, т.к. скрипт запускается из папки 'app', а импортировать надо из 'src'
+# --- Добавляем КОРЕНЬ ПРОЕКТА в sys.path ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir) # Поднимаемся на уровень выше (в корень проекта)
-src_path = os.path.join(project_root, 'src')
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
+project_root = os.path.dirname(current_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root) # Добавляем КОРЕНЬ проекта
 # ---------------------------------------------------
 
 # --- Импорты из src ---
+# Импорты выполняются после добавления project_root в sys.path
 try:
     from src.config import CSV_FILE, DATA_DIR
     from src.scraper import setup_driver, scroll_and_collect
-    # Можно добавить импорт логгера или настроить здесь
+    # Можно настроить логгер здесь, если потребуется
+    # logger = logging.getLogger(__name__)
 except ImportError as e:
-     st.error(f"Ошибка импорта модулей из 'src': {e}")
-     st.error(f"Убедитесь, что структура папок верна и файл '{os.path.join(src_path, '__init__.py')}' существует.")
+     # Эта ошибка теперь не должна возникать, но оставим на всякий случай
+     st.error(f"Критическая ошибка: Не удалось импортировать модули из 'src': {e}")
+     st.error(f"Убедитесь, что структура папок верна, файл '{os.path.join(project_root, 'src', '__init__.py')}' существует, и запускаете скрипт из корневой папки проекта.")
      st.stop()
 # ----------------------
-
-# Настройка логирования (опционально, можно использовать стандартный логгер Streamlit)
-# logger = logging.getLogger(__name__) # Можно настроить свой логгер
 
 # === Настройки по умолчанию ===
 DEFAULT_SCROLL_WAIT_TIME = 2.0 # Секунды
@@ -35,7 +33,14 @@ DEFAULT_MAX_CONSECUTIVE_SAME_HEIGHT = 3 # Количество проверок 
 # === Интерфейс Streamlit ===
 st.set_page_config(page_title="SoundCloud Like Collector", layout="wide")
 st.title("🎵 SoundCloud Like Collector")
-st.caption(f"Собирает лайки и сохраняет их в `{os.path.relpath(CSV_FILE, project_root)}`") # Показываем относительный путь
+
+# Показываем относительный путь к CSV от корня проекта
+try:
+    # Убедимся, что CSV_FILE импортирован
+    csv_rel_path = os.path.relpath(CSV_FILE, project_root)
+except NameError:
+    csv_rel_path = os.path.join('data', 'liked_tracks.csv') # Запасной вариант
+st.caption(f"Собирает лайки и сохраняет их в `{csv_rel_path}`")
 
 # Колонки для ввода и настроек
 col1, col2 = st.columns([2, 1])
@@ -64,14 +69,20 @@ st.markdown("---")
 
 # Инфо о CSV
 existing_tracks = 0
-csv_exists = os.path.exists(CSV_FILE)
-if csv_exists:
-    try:
-        df_existing = pd.read_csv(CSV_FILE)
-        existing_tracks = len(df_existing)
-        st.info(f"ℹ️ Найден `{os.path.relpath(CSV_FILE, project_root)}` ({existing_tracks} треков). Будет перезаписан.")
-    except Exception as e:
-        st.warning(f"⚠️ Не удалось прочитать `{CSV_FILE}`: {e}")
+try:
+    # Убедимся, что CSV_FILE импортирован
+    csv_full_path = CSV_FILE
+    csv_exists = os.path.exists(csv_full_path)
+    if csv_exists:
+        try:
+            df_existing = pd.read_csv(csv_full_path)
+            existing_tracks = len(df_existing)
+            st.info(f"ℹ️ Найден `{csv_rel_path}` ({existing_tracks} треков). Будет перезаписан.")
+        except Exception as e:
+            st.warning(f"⚠️ Не удалось прочитать `{csv_rel_path}`: {e}")
+except NameError:
+    st.warning("⚠️ Не удалось определить путь к CSV файлу (ошибка импорта?).")
+
 
 # --- Логика обратной связи для Streamlit ---
 # Используем session_state для хранения временных сообщений и прогресса
@@ -133,6 +144,11 @@ if start_button:
 
         driver = None
         try:
+            # Проверяем, что функции действительно импортированы
+            if 'setup_driver' not in globals() or 'scroll_and_collect' not in globals():
+                 st.error("Критическая ошибка: Не удалось импортировать функции из src.")
+                 st.stop()
+
             with st.spinner("Инициализация драйвера Chrome..."):
                 driver = setup_driver() # setup_driver теперь вызывает st.stop() при критической ошибке
 
@@ -153,10 +169,19 @@ if start_button:
                     df_new = pd.DataFrame(collected_list, columns=["Title", "Link"])
                     st.dataframe(df_new, height=300)
                     try:
+                         # Проверяем, что переменные пути импортированы
+                         if 'DATA_DIR' not in globals() or 'CSV_FILE' not in globals():
+                              st.error("Критическая ошибка: Не удалось импортировать пути из src.config.")
+                              st.stop()
+
                          # Убедимся что папка data существует
                          os.makedirs(DATA_DIR, exist_ok=True)
+                         # Сохраняем CSV
                          df_new.to_csv(CSV_FILE, index=False, encoding='utf-8')
-                         st.info(f"💾 Данные сохранены в `{os.path.relpath(CSV_FILE, project_root)}`.")
+                         # Получаем относительный путь для отображения
+                         csv_display_path = os.path.relpath(CSV_FILE, project_root)
+                         st.info(f"💾 Данные сохранены в `{csv_display_path}`.")
+                         # Кнопка скачивания
                          csv_data = df_new.to_csv(index=False).encode('utf-8')
                          st.download_button(
                             label="⬇️ Скачать CSV", data=csv_data,
@@ -171,7 +196,14 @@ if start_button:
 
         except Exception as e: # Ловим ошибки от setup_driver или другие
             st.error(f"Произошла критическая ошибка: {e}")
+            # Добавим вывод traceback для диагностики, если нужно
+            # import traceback
+            # st.error("Traceback:")
+            # st.code(traceback.format_exc())
         finally:
             if driver:
-                driver.quit()
-                st.info("Драйвер Chrome закрыт.")
+                try:
+                    driver.quit()
+                    st.info("Драйвер Chrome закрыт.")
+                except Exception as e:
+                    st.warning(f"Не удалось корректно закрыть драйвер Chrome: {e}")
