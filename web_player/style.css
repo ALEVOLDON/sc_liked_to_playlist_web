@@ -1,217 +1,578 @@
-/* Копируем все CSS стили из <style>...</style> блока файла index.html */
-/* из предыдущего ответа (где был улучшенный дизайн плеера) сюда. */
-/* Пример начала файла: */
+/* CSS стили для веб-плеера */
 :root {
+    /* --- Переменные --- */
     --font-family: 'Inter', sans-serif;
+    --transition-speed: 0.2s;
+    --border-radius: 12px;
+    --cover-size: 280px;
+    --player-width: 360px;
 
     /* Light Theme */
     --bg-light: #f8f9fa;
     --player-bg-light: #ffffff;
-    /* ... и так далее, все переменные и стили ... */
+    --playlist-bg-light: #f1f3f5;
+    --text-primary-light: #212529;
+    --text-secondary-light: #6c757d;
+    --accent-light: #007bff;
+    --accent-hover-light: #0056b3;
+    --border-light: #dee2e6;
+    --highlight-light: #e9ecef;
+    --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --scrollbar-light: #ced4da;
+    --scrollbar-hover-light: #adb5bd;
+
+    /* Dark Theme */
+    --bg-dark: #121212;
+    --player-bg-dark: #1e1e1e;
+    --playlist-bg-dark: #242424;
+    --text-primary-dark: #e9ecef;
+    --text-secondary-dark: #adb5bd;
+    --accent-dark: #3498db;
+    --accent-hover-dark: #2980b9;
+    --border-dark: #343a40;
+    --highlight-dark: #2c2c2c;
+    --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.2);
+    --scrollbar-dark: #495057;
+    --scrollbar-hover-dark: #6c757d;
+
+    /* Default Theme (Light) */
+    --bg: var(--bg-light);
+    --player-bg: var(--player-bg-light);
+    --playlist-bg: var(--playlist-bg-light);
+    --text-primary: var(--text-primary-light);
+    --text-secondary: var(--text-secondary-light);
+    --accent: var(--accent-light);
+    --accent-hover: var(--accent-hover-light);
+    --border: var(--border-light);
+    --highlight: var(--highlight-light);
+    --shadow: var(--shadow-light);
+    --scrollbar: var(--scrollbar-light);
+    --scrollbar-hover: var(--scrollbar-hover-light);
 }
 
 body.dark-theme {
-    /* ... переменные темной темы ... */
+    /* --- Переопределение для темной темы --- */
+    --bg: var(--bg-dark);
+    --player-bg: var(--player-bg-dark);
+    --playlist-bg: var(--playlist-bg-dark);
+    --text-primary: var(--text-primary-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --accent: var(--accent-dark);
+    --accent-hover: var(--accent-hover-dark);
+    --border: var(--border-dark);
+    --highlight: var(--highlight-dark);
+    --shadow: var(--shadow-dark);
+    --scrollbar: var(--scrollbar-dark);
+    --scrollbar-hover: var(--scrollbar-hover-dark);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* --- Базовые стили --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-html { font-size: 16px; }
+html {
+    font-size: 16px;
+}
 
 body {
-    /* ... стили body ... */
+    font-family: var(--font-family);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    height: 100vh;
+    display: flex;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    overflow: hidden;
 }
 
-/* ... все остальные стили для .container, .player, .cover, и т.д. ... */
+/* --- Контейнер --- */
+.container {
+    display: flex;
+    width: calc(100% - 2rem);
+    height: calc(100% - 2rem);
+    max-height: 95vh;
+    margin: 1rem;
+    background: var(--player-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: background-color var(--transition-speed) ease;
+}
 
-/* Добавьте стиль для скрытия элементов при фильтрации */
+/* --- Стили плеера --- */
+.player {
+    width: var(--player-width);
+    padding: 2rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    transition: border-color var(--transition-speed) ease;
+}
+
+.cover {
+    width: var(--cover-size);
+    height: var(--cover-size);
+    position: relative;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--text-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s ease;
+}
+
+.cover img.hidden {
+    opacity: 0;
+}
+
+.cover .default-icon {
+    width: 60%;
+    height: 60%;
+    fill: var(--player-bg);
+    position: absolute;
+    opacity: 0.5;
+    transition: fill var(--transition-speed) ease;
+}
+
+.track-info {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    min-height: 4.5em; /* Резервируем место под 2 строки заголовка + исполнитель */
+}
+
+.track-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Ограничение двумя строками */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color var(--transition-speed) ease;
+}
+
+.track-artist {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color var(--transition-speed) ease;
+}
+
+.progress-container {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.progress {
+    background: var(--highlight);
+    height: 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.progress-bar {
+    background: var(--accent);
+    height: 100%;
+    border-radius: 3px;
+    width: 0;
+    transition: width 0.1s linear, background-color var(--transition-speed) ease;
+}
+
+.time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.6rem;
+    transition: color var(--transition-speed) ease;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, transform 0.1s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn:hover {
+    color: var(--text-primary);
+    background: var(--highlight);
+}
+
+.btn:active {
+    transform: scale(0.92);
+}
+
+.btn .material-symbols-outlined {
+    font-size: 26px;
+    transition: transform 0.2s ease;
+    user-select: none; /* Предотвратить выделение иконок */
+}
+
+.btn:hover .material-symbols-outlined {
+    transform: scale(1.1);
+}
+
+.btn.play-pause {
+    background: var(--accent);
+    color: white;
+    padding: 0.9rem;
+    transition: background-color var(--transition-speed) ease, transform 0.1s ease, box-shadow 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 123, 255, 0.3);
+}
+
+body.dark-theme .btn.play-pause {
+    box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn.play-pause:hover {
+    background: var(--accent-hover);
+    color: white;
+}
+
+.btn.play-pause .material-symbols-outlined {
+    font-size: 30px;
+}
+
+.btn.play-pause:hover .material-symbols-outlined {
+    transform: none;
+}
+
+.btn.active {
+    color: var(--accent);
+}
+
+.btn.active:hover {
+    color: var(--accent-hover);
+}
+
+/* Стили для регулятора громкости */
+.volume-control {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Центрируем в колонке плеера */
+    width: 80%; /* Ограничиваем ширину */
+    margin-bottom: 2rem;
+    gap: 0.75rem;
+}
+
+.volume-control .btn {
+    padding: 0.3rem; /* Маленькие кнопки по бокам */
+}
+
+.volume-control .btn .material-symbols-outlined {
+    font-size: 22px;
+}
+
+.volume-slider {
+    flex-grow: 1;
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    background: var(--highlight);
+    outline: none;
+    border-radius: 2.5px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+/* Chrome, Edge, Safari */
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.volume-slider:hover::-webkit-slider-thumb {
+    background: var(--accent-hover);
+}
+
+/* Firefox */
+.volume-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none; /* Убрать границу FF */
+    transition: background-color var(--transition-speed) ease;
+}
+
+.volume-slider:hover::-moz-range-thumb {
+    background: var(--accent-hover);
+}
+
+/* --- Стили плейлиста --- */
+.playlist-column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.playlist-controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem; /* Увеличили вертикальный паддинг */
+    border-bottom: 1px solid var(--border);
+    background: var(--playlist-bg);
+    flex-shrink: 0; /* Не сжимается */
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.playlist-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.search-filter {
+    display: flex;
+    align-items: center;
+    background: var(--player-bg); /* Фон как у плеера */
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px; /* Скругленный */
+    border: 1px solid var(--border);
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    margin-left: auto; /* Сдвигаем вправо */
+    margin-right: 1rem; /* Отступ от кнопки темы */
+}
+
+.search-filter .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--text-secondary);
+    margin-right: 0.5rem;
+}
+
+.search-filter input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    width: 150px; /* Начальная ширина */
+    transition: width 0.3s ease, color var(--transition-speed) ease;
+}
+
+.search-filter input:focus {
+    width: 200px; /* Увеличиваем при фокусе */
+}
+
+.playlist {
+    flex: 1;
+    background: var(--playlist-bg);
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    transition: background-color var(--transition-speed) ease;
+}
+
+.playlist-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease;
+    margin-bottom: 0.6rem;
+    border: 1px solid transparent;
+}
+
 .playlist-item.hidden {
-    display: none;
+    display: none; /* Для фильтрации */
 }
 
-/* CSS стили остаются такими же, как в предыдущем ответе, */
-        /* но добавляются стили для новых элементов: */
-        :root {
-            /* ... (все переменные тем из предыдущего ответа) ... */
-            --font-family: 'Inter', sans-serif;
-            --bg-light: #f8f9fa; --player-bg-light: #ffffff; --playlist-bg-light: #f1f3f5;
-            --text-primary-light: #212529; --text-secondary-light: #6c757d; --accent-light: #007bff;
-            --accent-hover-light: #0056b3; --border-light: #dee2e6; --highlight-light: #e9ecef;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08); --scrollbar-light: #ced4da; --scrollbar-hover-light: #adb5bd;
-            --bg-dark: #121212; --player-bg-dark: #1e1e1e; --playlist-bg-dark: #242424;
-            --text-primary-dark: #e9ecef; --text-secondary-dark: #adb5bd; --accent-dark: #3498db;
-            --accent-hover-dark: #2980b9; --border-dark: #343a40; --highlight-dark: #2c2c2c;
-            --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.2); --scrollbar-dark: #495057; --scrollbar-hover-dark: #6c757d;
-            --bg: var(--bg-light); --player-bg: var(--player-bg-light); --playlist-bg: var(--playlist-bg-light);
-            --text-primary: var(--text-primary-light); --text-secondary: var(--text-secondary-light); --accent: var(--accent-light);
-            --accent-hover: var(--accent-hover-light); --border: var(--border-light); --highlight: var(--highlight-light);
-            --shadow: var(--shadow-light); --scrollbar: var(--scrollbar-light); --scrollbar-hover: var(--scrollbar-hover-light);
-            --border-radius: 12px; --cover-size: 280px; --player-width: 360px; --transition-speed: 0.2s;
-        }
-        body.dark-theme {
-            --bg: var(--bg-dark); --player-bg: var(--player-bg-dark); --playlist-bg: var(--playlist-bg-dark);
-            --text-primary: var(--text-primary-dark); --text-secondary: var(--text-secondary-dark); --accent: var(--accent-dark);
-            --accent-hover: var(--accent-hover-dark); --border: var(--border-dark); --highlight: var(--highlight-dark);
-            --shadow: var(--shadow-dark); --scrollbar: var(--scrollbar-dark); --scrollbar-hover: var(--scrollbar-hover-dark);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 16px; }
-        body {
-            font-family: var(--font-family); background: var(--bg); color: var(--text-primary);
-            line-height: 1.6; height: 100vh; display: flex;
-            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-            overflow: hidden;
-        }
-        .container {
-            display: flex; width: calc(100% - 2rem); height: calc(100% - 2rem);
-            max-height: 95vh; margin: 1rem; background: var(--player-bg);
-            border-radius: var(--border-radius); box-shadow: var(--shadow);
-            overflow: hidden; transition: background-color var(--transition-speed) ease;
-        }
-        .player {
-            width: var(--player-width); padding: 2rem; border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; align-items: center;
-            flex-shrink: 0; transition: border-color var(--transition-speed) ease;
-        }
-        .cover {
-            width: var(--cover-size); height: var(--cover-size); position: relative; margin-bottom: 2rem;
-            border-radius: 8px; overflow: hidden; background: var(--text-secondary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: flex; justify-content: center; align-items: center;
-        }
-        .cover img { display: block; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease; }
-        .cover img.hidden { opacity: 0; }
-        .cover .default-icon { width: 60%; height: 60%; fill: var(--player-bg); position: absolute; opacity: 0.5; transition: fill var(--transition-speed) ease; }
-        .track-info { text-align: center; margin-bottom: 1.5rem; width: 100%; min-height: 4.5em; }
-        .track-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.4rem; line-height: 1.4; color: var(--text-primary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; transition: color var(--transition-speed) ease; }
-        .track-artist { color: var(--text-secondary); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--transition-speed) ease; }
-        .progress-container { width: 100%; margin-bottom: 1.5rem; }
-        .progress { background: var(--highlight); height: 6px; border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; transition: background-color var(--transition-speed) ease; }
-        .progress-bar { background: var(--accent); height: 100%; border-radius: 3px; width: 0; transition: width 0.1s linear, background-color var(--transition-speed) ease; }
-        .time { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.6rem; transition: color var(--transition-speed) ease; }
-        .controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; width: 100%; }
-        .btn { background: none; border: none; cursor: pointer; padding: 0.5rem; border-radius: 50%; color: var(--text-secondary); transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, transform 0.1s ease; display: inline-flex; justify-content: center; align-items: center; }
-        .btn:hover { color: var(--text-primary); background: var(--highlight); }
-        .btn:active { transform: scale(0.92); }
-        .btn .material-symbols-outlined { font-size: 26px; transition: transform 0.2s ease; user-select: none; /* Предотвратить выделение иконок */ }
-        .btn:hover .material-symbols-outlined { transform: scale(1.1); }
-        .btn.play-pause { background: var(--accent); color: white; padding: 0.9rem; transition: background-color var(--transition-speed) ease, transform 0.1s ease, box-shadow 0.2s ease; box-shadow: 0 3px 8px rgba(0, 123, 255, 0.3); }
-        body.dark-theme .btn.play-pause { box-shadow: 0 3px 8px rgba(52, 152, 219, 0.3); }
-        .btn.play-pause:hover { background: var(--accent-hover); color: white; }
-        .btn.play-pause .material-symbols-outlined { font-size: 30px; }
-        .btn.play-pause:hover .material-symbols-outlined { transform: none; }
-        .btn.active { color: var(--accent); }
-        .btn.active:hover { color: var(--accent-hover); }
+.playlist-item:hover {
+    background: var(--highlight);
+}
 
-        /* Стили для регулятора громкости */
-        .volume-control {
-            display: flex;
-            align-items: center;
-            justify-content: center; /* Центрируем в колонке плеера */
-            width: 80%; /* Ограничиваем ширину */
-            margin-bottom: 2rem;
-            gap: 0.75rem;
-        }
-        .volume-control .btn { padding: 0.3rem; /* Маленькие кнопки по бокам */ }
-        .volume-control .btn .material-symbols-outlined { font-size: 22px; }
-        .volume-slider {
-            flex-grow: 1;
-            -webkit-appearance: none; /* Override default look */
-            appearance: none;
-            width: 100%;
-            height: 5px;
-            background: var(--highlight);
-            outline: none;
-            border-radius: 2.5px;
-            cursor: pointer;
-            transition: background-color var(--transition-speed) ease;
-        }
-        /* Chrome, Edge, Safari */
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none;
-            width: 14px; height: 14px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color var(--transition-speed) ease;
-        }
-        .volume-slider:hover::-webkit-slider-thumb { background: var(--accent-hover); }
-        /* Firefox */
-        .volume-slider::-moz-range-thumb {
-            width: 14px; height: 14px;
-            background: var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none; /* Убрать границу FF */
-            transition: background-color var(--transition-speed) ease;
-        }
-         .volume-slider:hover::-moz-range-thumb { background: var(--accent-hover); }
+.playlist-item.active {
+    background: var(--accent);
+    color: white;
+}
 
+.playlist-item.active .artist,
+.playlist-item.active .duration {
+    color: rgba(255, 255, 255, 0.7);
+}
 
-        .playlist-column { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
-        .playlist-controls {
-            width: 100%; display: flex; justify-content: space-between; align-items: center;
-            padding: 0.75rem 1.5rem; /* Увеличили вертикальный паддинг */
-            border-bottom: 1px solid var(--border); background: var(--playlist-bg);
-            flex-shrink: 0; /* Не сжимается */
-            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
-        }
-         .playlist-title { font-size: 1.1rem; font-weight: 600; }
-         .search-filter {
-            display: flex;
-            align-items: center;
-            background: var(--player-bg); /* Фон как у плеера */
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px; /* Скругленный */
-            border: 1px solid var(--border);
-            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
-            margin-left: auto; /* Сдвигаем вправо */
-            margin-right: 1rem; /* Отступ от кнопки темы */
-        }
-        .search-filter .material-symbols-outlined {
-            font-size: 20px;
-            color: var(--text-secondary);
-            margin-right: 0.5rem;
-        }
-        .search-filter input {
-            border: none;
-            outline: none;
-            background: transparent;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            width: 150px; /* Начальная ширина */
-            transition: width 0.3s ease, color var(--transition-speed) ease;
-        }
-         .search-filter input:focus { width: 200px; /* Увеличиваем при фокусе */ }
+.playlist-item-info {
+    margin-left: 1rem;
+    overflow: hidden;
+    flex-grow: 1;
+}
 
-        .playlist { flex: 1; background: var(--playlist-bg); overflow-y: auto; padding: 1rem 1.5rem; transition: background-color var(--transition-speed) ease; }
-        .playlist-item { display: flex; align-items: center; padding: 0.8rem 1rem; border-radius: 8px; cursor: pointer; transition: background-color var(--transition-speed) ease; margin-bottom: 0.6rem; border: 1px solid transparent; }
-        .playlist-item.hidden { display: none; } /* Для фильтрации */
-        .playlist-item:hover { background: var(--highlight); }
-        .playlist-item.active { background: var(--accent); color: white; }
-        .playlist-item.active .artist, .playlist-item.active .duration { color: rgba(255, 255, 255, 0.7); }
-        .playlist-item-info { margin-left: 1rem; overflow: hidden; flex-grow: 1; }
-        .playlist-item .title { font-weight: 500; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 0.1rem; color: var(--text-primary); transition: color var(--transition-speed) ease; }
-        .playlist-item.active .title { color: white; }
-        .playlist-item .artist { font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--transition-speed) ease; }
-        .playlist-item .duration { font-size: 0.85rem; color: var(--text-secondary); margin-left: auto; padding-left: 1rem; flex-shrink: 0; transition: color var(--transition-speed) ease; }
+.playlist-item .title {
+    font-weight: 500;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.1rem;
+    color: var(--text-primary);
+    transition: color var(--transition-speed) ease;
+}
 
-        .playlist::-webkit-scrollbar { width: 10px; }
-        .playlist::-webkit-scrollbar-track { background: transparent; }
-        .playlist::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 5px; border: 3px solid var(--playlist-bg); transition: background-color var(--transition-speed) ease; }
-        .playlist::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
-        .error-message { padding: 1rem; color: #dc3545; text-align: center; font-size: 0.9rem; }
+.playlist-item.active .title {
+    color: white;
+}
 
-        @media (max-width: 768px) {
-            body { overflow: auto; }
-            .container { flex-direction: column; width: 100%; height: auto; margin: 0; border-radius: 0; box-shadow: none; }
-            .player { width: 100%; padding: 1.5rem; border-right: none; border-bottom: 1px solid var(--border); }
-            .cover { width: 60%; padding-top: 0; height: 60vw; max-height: 250px; max-width: 250px; margin-bottom: 1.5rem; } /* Адаптивная обложка */
-            .volume-control { width: 90%; margin-bottom: 1.5rem; }
-            .playlist-column { flex-grow: 1; height: auto; }
-            .playlist-controls { padding: 0.75rem 1rem; }
-            .search-filter { margin-right: 0.5rem; }
-            .search-filter input { width: 100px; }
-            .search-filter input:focus { width: 120px; }
-            .playlist { height: auto; flex-grow: 1; padding: 1rem; }
-            .playlist-item .duration { display: none; } /* Скрыть длительность на моб */
-        }
+.playlist-item .artist {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color var(--transition-speed) ease;
+}
+
+.playlist-item .duration {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-left: auto;
+    padding-left: 1rem;
+    flex-shrink: 0;
+    transition: color var(--transition-speed) ease;
+}
+
+/* --- Стили скроллбара --- */
+.playlist::-webkit-scrollbar {
+    width: 10px;
+}
+
+.playlist::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.playlist::-webkit-scrollbar-thumb {
+    background: var(--scrollbar);
+    border-radius: 5px;
+    border: 3px solid var(--playlist-bg); /* Отступ от края */
+    transition: background-color var(--transition-speed) ease;
+}
+
+.playlist::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-hover);
+}
+
+/* --- Сообщение об ошибке --- */
+.error-message {
+    padding: 1rem;
+    color: #dc3545; /* Цвет ошибки Bootstrap */
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* --- Адаптивность (Медиа-запросы) --- */
+@media (max-width: 768px) {
+    body {
+        overflow: auto; /* Разрешаем скролл на маленьких экранах */
+    }
+
+    .container {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        max-height: none; /* Снимаем ограничение по высоте */
+    }
+
+    .player {
+        width: 100%;
+        padding: 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .cover {
+        width: 60%;
+        padding-top: 0;
+        height: 60vw; /* Адаптивная высота обложки */
+        max-height: 250px; /* Ограничение макс. высоты */
+        max-width: 250px;  /* Ограничение макс. ширины */
+        margin-bottom: 1.5rem;
+    }
+
+    .volume-control {
+        width: 90%;
+        margin-bottom: 1.5rem;
+    }
+
+    .playlist-column {
+        flex-grow: 1;
+        height: auto; /* Авто высота для плейлиста */
+    }
+
+    .playlist-controls {
+        padding: 0.75rem 1rem;
+    }
+
+    .search-filter {
+        margin-right: 0.5rem;
+    }
+
+    .search-filter input {
+        width: 100px;
+    }
+
+    .search-filter input:focus {
+        width: 120px;
+    }
+
+    .playlist {
+        height: auto; /* Авто высота */
+        flex-grow: 1;
+        padding: 1rem;
+    }
+
+    .playlist-item .duration {
+        display: none; /* Скрыть длительность на мобильных */
+    }
+}

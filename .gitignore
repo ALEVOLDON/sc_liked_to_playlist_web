@@ -1,97 +1,54 @@
-# Byte-compiled / optimized / DLL files
+# Python cache
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
 
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# Environments (ВАЖНО: игнорируем папки виртуальных окружений)
-.env
-.venv
-env/
+# Virtual environment
 venv/
-ENV/
+.venv/
+env/
+.env/
+*_env/
 env.bak/
 venv.bak/
 
-# IDE / Editor specific settings
-.vscode/
+# IDE / Editor specific
 .idea/
+.vscode/
 *.sublime-project
 *.sublime-workspace
-.spyderproject
-.spyproject
-.ropeproject
 
-# OS generated files
+# OS specific
 .DS_Store
 Thumbs.db
 
-# Webdriver / Browser Driver logs
-geckodriver.log
-chromedriver.log
-webdrivermanager.log
+# Data files (Generated and User-specific)
+data/liked_tracks.csv
+data/downloaded.txt
+data/liked_playlist.m3u
+data/*.log
+# Можно добавить .gitkeep в папку data, если хотите сохранить саму папку пустой
 
-# FFmpeg executable (если вы поместили его в корень проекта)
-ffmpeg.exe
+# Downloaded media and backups
+downloads/
+# Можно добавить .gitkeep в папку downloads
+downloads_backup/
+# Можно добавить .gitkeep в папку downloads_backup
+
+# Generated web player playlist
+web_player/playlist.json
+
+# Temporary files
+*.part
+*.tmp
+
+# FFmpeg executable (if placed in root)
 ffmpeg
+ffmpeg.exe
 
-# --- Project Specific Ignores ---
+# Log files potentially generated elsewhere
+*.log
 
-# Папка с данными (CSV, архив скачанных, логи)
-/data/
-
-# Папка со скачанными файлами (MP3, обложки)
-/downloads/
-
-# Папка с бэкапами скачанных файлов
-/downloads_backup/
-
-# Лог файлы в корне (на всякий случай, хотя они в data/)
-# *.log
-
-# Tool specific folders (замечено в скриншотах)
-/.qodo/
+# Streamlit secrets (if used)
+.streamlit/secrets.toml
