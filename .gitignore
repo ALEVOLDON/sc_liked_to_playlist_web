@@ -1,1 +1,97 @@
-.qodo
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environments (ВАЖНО: игнорируем папки виртуальных окружений)
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE / Editor specific settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Webdriver / Browser Driver logs
+geckodriver.log
+chromedriver.log
+webdrivermanager.log
+
+# FFmpeg executable (если вы поместили его в корень проекта)
+ffmpeg.exe
+ffmpeg
+
+# --- Project Specific Ignores ---
+
+# Папка с данными (CSV, архив скачанных, логи)
+/data/
+
+# Папка со скачанными файлами (MP3, обложки)
+/downloads/
+
+# Папка с бэкапами скачанных файлов
+/downloads_backup/
+
+# Лог файлы в корне (на всякий случай, хотя они в data/)
+# *.log
+
+# Tool specific folders (замечено в скриншотах)
+/.qodo/
